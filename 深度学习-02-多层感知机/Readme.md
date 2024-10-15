@@ -134,7 +134,7 @@ for x_test, y_test in test_iter:
     correct = torch.sum(correct)
     total_correct += correct
 
-acc = total_correct / y_test.shape[0]
+acc = total_correct / len(test_iter.dataset)
 print('test_acc', acc)
 ```
 
