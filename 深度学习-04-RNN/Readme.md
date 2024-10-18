@@ -113,5 +113,8 @@ for epoch in range(epochs):
 
     print("Epoch {}, loss: {}".format(epoch, loss_all.data / (len(train_iter) / batch_size)))
 
-
 ```
+
+# 3. 后续优化
+
+后续可以对超参数进行调整、引入预训练的词向量对模型进行优化；
