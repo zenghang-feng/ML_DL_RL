@@ -28,7 +28,7 @@ vec_size = 300
 TEXT.build_vocab(data_train, vectors=GloVe(name='6B', dim=vec_size), max_size=max_size-2, min_freq=10)
 LABEL.build_vocab(data_train)
 
-batch_size = 128
+batch_size = 32
 train_iter, test_iter = data.BucketIterator.splits((data_train, data_test), batch_size=batch_size, shuffle=True)
 
 
@@ -49,15 +49,13 @@ b_o = torch.zeros((output_size))
 parameters = [w_ih, w_hh, b_h, w_ho, b_o]
 for p in parameters:
     p.requires_grad_(True)
-# 初始化隐藏层的状态矩阵 ============================================
-hide_state = torch.rand((batch_size, hidde_size))
 
 #################################################################
 # 定义网络训练的超参数，训练网络
 #################################################################
 # 定义迭代训练的次数，学习率 ========================================
 epochs = 300
-lr = 0.005
+lr = 0.01
 
 # 开始训练网络 ====================================================
 print('---------------------开始训练网络-------------------------')
@@ -70,8 +68,9 @@ for epoch in range(epochs):
         x_t = x.t()                                     # 转置为 时间步 x batch_size
 
         x_t_onehot = F.one_hot(x_t, num_classes=max_size).type(torch.float)
-        if len(x_t_onehot[0]) != batch_size:            # 最后一个不是batch_size大小的样本不参与训练
-            continue
+
+        # 初始化隐藏层的状态矩阵 --------------------------------
+        hide_state = torch.rand((len(x_t_onehot[0]), hidde_size))
         vec_out = []                                    # 存储每个时间步的输出，后续只取最后一个时间步的输出
         # 前向传播 --------------------------------------------
         for i in range(time_steps):
@@ -91,7 +90,14 @@ for epoch in range(epochs):
 
         loss.backward()
 
-        # 梯度更新 -------------------------------------------- RNN比较容易出现梯度消失或者爆炸的问题，后续可以进一步优化
+        # 梯度剪裁，处理可能出现的梯度爆炸问题 ---------------------
+        theta = 1
+        norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in parameters))
+        if norm > theta:
+            for p in parameters:
+                p.grad[:] *= theta / norm
+
+        # 梯度更新 -------------------------------------------- 可以通过参数列表迭代更新
         w_ih.data = w_ih.data - lr * w_ih.grad
         w_hh.data = w_hh.data - lr * w_hh.grad
         b_h.data = b_h.data - lr * b_h.grad
@@ -106,7 +112,6 @@ for epoch in range(epochs):
         b_o.grad.data.zero_()
 
     print("Epoch {}, loss: {}".format(epoch, loss_all.data / (len(train_iter) / batch_size)))
-
 
 
 ```
