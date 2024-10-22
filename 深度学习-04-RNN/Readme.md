@@ -45,15 +45,15 @@ input_size = vec_size           # 等于独热编码大小，也是词表大小
 hidde_size = 300                # 隐藏层向量维度自定义设置
 output_size = 2                 # 输出层维度是分类维度，这里是二分类
 # RNN隐藏层参数 ===================================================
-w_ih = torch.rand((input_size, hidde_size))
-w_hh = torch.rand((hidde_size, hidde_size))
+w_ih = torch.randn((input_size, hidde_size))
+w_hh = torch.randn((hidde_size, hidde_size))
 b_h = torch.zeros(hidde_size)
 # RNN输出层参数 ===================================================
-w_ho = torch.rand((hidde_size, output_size))
+w_ho = torch.randn((hidde_size, output_size))
 b_o = torch.zeros(output_size)
 # 线性层参数 ======================================================
-w_l = torch.rand((time_steps*output_size, output_size))
-b_l = torch.rand(output_size)
+w_l = torch.randn((time_steps*output_size, output_size))
+b_l = torch.randn(output_size)
 # 配置梯度 ========================================================
 parameters = [w_ih, w_hh, b_h, w_ho, b_o, w_l, b_l]
 for p in parameters:
@@ -66,7 +66,7 @@ loss_fun = nn.CrossEntropyLoss()
 #################################################################
 # 定义迭代训练的次数，学习率 ========================================
 epochs = 300
-lr = 0.001
+lr = 0.005
 
 # 开始训练网络 ====================================================
 print('---------------------开始训练网络-------------------------')
@@ -82,7 +82,7 @@ for epoch in range(epochs):
 
         # 初始化隐藏层的状态矩阵 --------------------------------
         batch_size_real = len(x_t_vec[0])                           # 最后一个不足batch_size的小批次单独处理
-        hide_state = torch.rand((batch_size_real, hidde_size))
+        hide_state = torch.randn((batch_size_real, hidde_size))
         vec_out = []                                                # 存储每个时间步的输出，后续只取最后一个时间步的输出
         # 前向传播 --------------------------------------------
         for i in range(time_steps):
@@ -132,4 +132,4 @@ for epoch in range(epochs):
 
 # 3. 后续优化
 
-可以继续对超参数进行调整；
+1、可以继续对超参数进行调整；2、改用双向RNN用于文本分类；
