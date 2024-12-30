@@ -119,3 +119,6 @@ df_iris_dr[df_iris_dr["target"] == 2].plot.scatter(x="f1", y="f2", color="b", la
 plt.show()
 
 ```
+
+降到2个维度之后，绘制不同类别数据的散点图如下：
+[i](https://github.com/zenghang-feng/ML_DL_RL/blob/main/机器学习-08-降维算法-AutoEncoder/Softmax_ASGD.png)
